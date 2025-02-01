@@ -1,0 +1,23 @@
+:root {
+    --background: #1a1a1a;          /* Dark background */
+    --primary-color: #2c2c2c;       /* Slightly lighter dark for primary elements */
+    --secondary-color: #3a3a3a;     /* Medium dark for secondary elements */
+    --accent-color: #00ff88;        /* Vibrant neon green for accents */
+    --text-color: #e0e0e0;          /* Light gray for text */
+}
+
+*{
+    margin: 0;
+    padding: 0;
+}
+
+html{
+    font-family: Gilroy;
+    font-size: 16pt;
+    color: var(--text-color)
+}
+
+body{
+    min-height: 100vh;
+    padding:10px;
+}
