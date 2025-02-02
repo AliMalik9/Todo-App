@@ -1,31 +1,51 @@
-<!DOCTYPE html>
-<html lang="en">
+const todoForm = document.querySelector('form')
+const todoInput = document.querySelector('#todo-input')
+const todoListUL = document.getElementById('todo-list')
 
-<head>
-    <title>Todo App</title>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
-    <link rel="stylesheet" href="style.css" />
-    <script src="app.js" defer></script>
-</head>
+let allTodos = getTodos();
+updateTodoList();
 
-<body>
-    <h1>Todo App</h1>
-    <div class="wrapper">
-        <form action="">
-            <input id="todo-input" type="text" placeholder="Write anything and hit Enter to add" autocomplete="off">
-            <button id="add-button">Add</button>
-        </form>
-        <ul id="todo-list">
-            <!-- <li class="todo">
-                 <input type="checkbox" id="todo-1">
-                <label class="custom-checkbox" for="todo-1">
+todoForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    addTodo()
+})
+
+function addTodo(){
+    const todoText = todoInput.value.trim();
+    if(todoText.length>0){
+        const todoObect = {
+            text: todoText,
+            completed: false
+        }
+        allTodos.push(todoObect);
+        updateTodoList();
+        saveTodos();
+        todoInput.value = ""
+    }
+}
+
+function updateTodoList(){
+    todoListUL.innerText = "";
+    allTodos.forEach((todo, todoIndex) => {
+        const todoItem = createTodoItem(todo, todoIndex);
+        todoListUL.append(todoItem);
+    });
+}
+
+function createTodoItem(todo, todoIndex){
+    const todoId = "todo-" + todoIndex;
+    const todoLi = document.createElement("li");
+    const todoText = todo.text
+    todoLi.className = "todo";
+    todoLi.innerHTML = `
+     <input type="checkbox" id="${todoId}">
+                <label class="custom-checkbox" for="${todoId}">
                     <svg fill="transparent" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" color="transparent" fill="none">
                         <path d="M21.8606 5.39176C22.2875 6.49635 21.6888 7.2526 20.5301 7.99754C19.5951 8.5986 18.4039 9.24975 17.1417 10.363C15.9044 11.4543 14.6968 12.7687 13.6237 14.0625C12.5549 15.351 11.6465 16.586 11.0046 17.5005C10.5898 18.0914 10.011 18.9729 10.011 18.9729C9.60281 19.6187 8.86895 20.0096 8.08206 19.9998C7.295 19.99 6.57208 19.5812 6.18156 18.9251C5.18328 17.248 4.41296 16.5857 4.05891 16.3478C3.11158 15.7112 2 15.6171 2 14.1335C2 12.9554 2.99489 12.0003 4.22216 12.0003C5.08862 12.0323 5.89398 12.373 6.60756 12.8526C7.06369 13.1591 7.54689 13.5645 8.04948 14.0981C8.63934 13.2936 9.35016 12.3653 10.147 11.4047C11.3042 10.0097 12.6701 8.51309 14.1349 7.22116C15.5748 5.95115 17.2396 4.76235 19.0042 4.13381C20.1549 3.72397 21.4337 4.28718 21.8606 5.39176Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                 </label>
-                <label for="todo-1" class="todo-text">
-                    WebDev Project with HTML, CSS, JS
+                <label for="${todoId}" class="todo-text">
+                    ${todoText}
                 </label>
                 <button class="delete-button">
                     <svg fill="var(--secondary-color)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" color="#000000" fill="none">
@@ -35,9 +55,32 @@
                         <path d="M14.5 16.5L14.5 10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
                     </svg>
                 </button>
-            </li> -->
-        </ul>
-    </div>
-</body>
+    `
+    const deleteButton = todoLi.querySelector('.delete-button')
+    deleteButton.addEventListener('click', ()=>{
+        deleteTodoItem(todoIndex)
+    })
+    const checkbox = todoLi.querySelector("input")
+        checkbox.addEventListener("change", ()=>{
+            allTodos[todoIndex].completed = checkbox.checked
+            saveTodos()
+        })
+    checkbox.checked = todo.completed;
+    return todoLi;
+}
 
-</html>
+function deleteTodoItem(todoIndex){
+    allTodos = allTodos.filter((_, i)=> i !== todoIndex)
+    saveTodos()
+    updateTodoList()
+}
+
+function saveTodos(){
+    const todosJson = JSON.stringify(allTodos)
+    localStorage.setItem("todos", todosJson)
+}
+
+function getTodos(){
+    const todos = localStorage.getItem("todos") || "[]"
+    return JSON.parse(todos)
+}
